@@ -90,6 +90,7 @@ try:
         Faithfulness,
     )
     from ragas.llms import LangchainLLMWrapper
+    from ragas.run_config import RunConfig
     from langchain_openai import ChatOpenAI, OpenAIEmbeddings
     from tqdm.auto import tqdm
 
@@ -189,6 +190,11 @@ class RAGEvaluator:
 
         if eval_embedding_base_url:
             embedding_kwargs["base_url"] = eval_embedding_base_url
+            # Ollama and many local OpenAI-compatible servers do not support
+            # base64 encoding format (they return "invalid input type").
+            # Force float encoding and disable ctx-length checking for custom endpoints.
+            embedding_kwargs["check_embedding_ctx_length"] = False
+            embedding_kwargs["model_kwargs"] = {"encoding_format": "float"}
 
         # Create base LangChain LLM
         base_llm = ChatOpenAI(**llm_kwargs)
@@ -476,6 +482,16 @@ class RAGEvaluator:
                         # Give tqdm time to initialize and claim its screen position
                         await asyncio.sleep(0.05)
 
+                    # Build a RunConfig whose timeout matches EVAL_LLM_TIMEOUT so
+                    # RAGAS's internal per-job limit doesn't kill slow local models
+                    # before the LLM client itself times out.
+                    ragas_timeout = int(os.getenv("EVAL_LLM_TIMEOUT", "600"))
+                    ragas_retries = int(os.getenv("EVAL_LLM_MAX_RETRIES", "5"))
+                    run_cfg = RunConfig(
+                        timeout=ragas_timeout,
+                        max_retries=ragas_retries,
+                        max_wait=60,
+                    )
                     eval_results = evaluate(
                         dataset=eval_dataset,
                         metrics=[
@@ -486,6 +502,7 @@ class RAGEvaluator:
                         ],
                         llm=self.eval_llm,
                         embeddings=self.eval_embeddings,
+                        run_config=run_cfg,
                         _pbar=pbar,
                     )
 

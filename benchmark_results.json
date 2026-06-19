@@ -1,0 +1,30 @@
+[
+  {
+    "backend": "NanoVectorDBStorage",
+    "num_vectors": 2000,
+    "num_queries": 200,
+    "top_k": 10,
+    "insert_seconds": 0.34330565998970997,
+    "insert_vectors_per_sec": 5825.712282343224,
+    "query_p50_ms": 0.3163209985359572,
+    "query_p95_ms": 3.995023199240677,
+    "query_mean_ms": 0.8636336855124682,
+    "recall_at_k": 1.0,
+    "index_size_bytes": 12299944,
+    "error": null
+  },
+  {
+    "backend": "FaissVectorDBStorage",
+    "num_vectors": 2000,
+    "num_queries": 200,
+    "top_k": 10,
+    "insert_seconds": 0.14698684099130332,
+    "insert_vectors_per_sec": 13606.660205169881,
+    "query_p50_ms": 0.2320334970136173,
+    "query_p95_ms": 0.24976665881695226,
+    "query_mean_ms": 0.23659367536311038,
+    "recall_at_k": 1.0,
+    "index_size_bytes": 6265825,
+    "error": null
+  }
+]

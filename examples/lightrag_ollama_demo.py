@@ -90,7 +90,7 @@ async def initialize_rag():
         summary_max_tokens=8192,
         llm_model_kwargs={
             "host": os.getenv("LLM_BINDING_HOST", "http://localhost:11434"),
-            "options": {"num_ctx": 8192},
+            "options": {"num_ctx": int(os.getenv("OLLAMA_LLM_NUM_CTX", "32768"))},
             "timeout": int(os.getenv("TIMEOUT", "300")),
         },
         # Note: ollama_embed is decorated with @wrap_embedding_func_with_attrs,
